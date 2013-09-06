@@ -1,14 +1,5 @@
 #!usr/bin/env python
 
-# last looked at by Mike on 8 May 2013
-# user-specific info:
-# "mike.kestemont@gmail.com"
-# "epicbigdata23"
-# test
-# 5
-# at the command line: nohup python scrape-0.2.py --username=mike.kestemont@gmail.com --password=epicbigdata23 --max_wait_interval=5 --decade="test" > output.txt 2>&1 &
-
-
 import mechanize
 import cookielib
 import os
