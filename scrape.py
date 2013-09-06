@@ -11,6 +11,7 @@ from ConfigParser import SafeConfigParser
 
 from lxml import html
 from lxml.html.clean import clean_html
+from lxml import etree
 
 # regular expresssions:
 semicolon = re.compile(r'\;')
@@ -19,14 +20,19 @@ SUP_htmltag = re.compile(r'(\<\/*SUP\>)+')
 page_span = re.compile(r'<span\s*class="page">\([0-9]+\s*of\s*[0-9]+\)</span><br\s*/>')
 tags_around_actual_text = re.compile(r'[\s\S]+\<\!\-\-\/\.post\-rail\-\-\>\s+<p>([\s\S]+)\<\/div\>\<\!\-\-\/\.entry\-contents\-\-\>[\s\S]+')
 
-def clean_page(page):
+def clean_page(page, lookupkey):
     page = page_span.sub(" ", p_htmltag.sub(" ", SUP_htmltag.sub(" ", tags_around_actual_text.sub(r"\1", page))))
-    tree = html.fromstring(page)
-    tree = clean_html(tree)
+    try:
+        tree = html.fromstring(page)
+        tree = clean_html(tree)
+    except etree.XMLSyntaxError:
+        print "We had an XMLSyntaxError in:", lookupkey
+        return page
     return tree.text_content()
 
 def _make_url(url_prefix, url_suffix):
     def make_url(lookupkey, counter=1):
+        print '%s%s-%s%s' % (url_prefix, lookupkey, counter, url_suffix
         return '%s%s-%s%s' % (url_prefix, lookupkey, counter, url_suffix)
     return make_url    
 
@@ -93,7 +99,7 @@ if __name__ == "__main__":
             continue
         # extract loopupkey
         lookupkey = str(data_items[0])
-        text = ' '.join(clean_page(page) for page in fetch_page(lookupkey, browser))
+        text = ' '.join(clean_page(page, lookupkey) for page in fetch_page(lookupkey, browser))
         with open("../texts/" + decade + "/" + lookupkey + ".txt", 'w') as out:
             out.write(text.encode("utf8"))
         time.sleep(random.randint(1,int(config.getint('options', 'maximum-wait-interval'))))
