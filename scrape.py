@@ -32,7 +32,7 @@ def clean_page(page, lookupkey):
 
 def _make_url(url_prefix, url_suffix):
     def make_url(lookupkey, counter=1):
-        print '%s%s-%s%s' % (url_prefix, lookupkey, counter, url_suffix
+        print '%s%s-%s%s' % (url_prefix, lookupkey, counter, url_suffix)
         return '%s%s-%s%s' % (url_prefix, lookupkey, counter, url_suffix)
     return make_url    
 
@@ -99,6 +99,7 @@ if __name__ == "__main__":
             continue
         # extract loopupkey
         lookupkey = str(data_items[0])
+        print lookupkey
         text = ' '.join(clean_page(page, lookupkey) for page in fetch_page(lookupkey, browser))
         with open("../texts/" + decade + "/" + lookupkey + ".txt", 'w') as out:
             out.write(text.encode("utf8"))
