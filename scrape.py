@@ -25,8 +25,8 @@ def clean_page(page, lookupkey):
     try:
         tree = html.fromstring(page)
         tree = clean_html(tree)
-    except etree.XMLSyntaxError:
-        print "We had an XMLSyntaxError in:", lookupkey
+    except etree.ParserError:
+        print "We had an ParserError in:", lookupkey
         return page
     return tree.text_content()
 
