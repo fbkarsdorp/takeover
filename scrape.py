@@ -8,6 +8,7 @@ import random
 import sys
 import time
 from ConfigParser import SafeConfigParser
+from urllib2 import HTTPError
 
 from lxml import html
 from lxml.html.clean import clean_html
@@ -100,9 +101,12 @@ if __name__ == "__main__":
         # extract loopupkey
         lookupkey = str(data_items[0])
         print lookupkey
-        text = ' '.join(clean_page(page, lookupkey) for page in fetch_page(lookupkey, browser))
-        with open("../texts/" + decade + "/" + lookupkey + ".txt", 'w') as out:
-            out.write(text.encode("utf8"))
+        try:
+            text = ' '.join(clean_page(page, lookupkey) for page in fetch_page(lookupkey, browser))
+            with open("../texts/" + decade + "/" + lookupkey + ".txt", 'w') as out:
+                out.write(text.encode("utf8"))
+        except HTTPError, e:
+            print "Got HTTPError", e
         time.sleep(random.randint(1,int(config.getint('options', 'maximum-wait-interval'))))
     print "Scraping terminated..."
 
