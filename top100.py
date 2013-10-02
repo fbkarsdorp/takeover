@@ -14,7 +14,7 @@ from joblib import Parallel, delayed
 
 def count_persons(decade):
     counter = Counter()
-    for filename in os.listdir(decade):
+    for filename in os.listdir(decade)[:50]:
         previous_person = ''
         with open(os.path.join(decade, filename)) as infile:
             for line in infile:
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     counts = sum(counters, Counter())
     top_n = dict((name, i) for i, name in enumerate(nlargest(n, counts, key=counts.__getitem__)))
     cooccurrences = np.zeros((n, n))
-    for decade in os.listdir(root):
+    for decade in os.listdir(root)[:50]:
         print decade
         decade = os.path.join(root, decade)
         for filename in os.listdir(decade):
@@ -59,6 +59,8 @@ if __name__ == '__main__':
         for j, name_j in enumerate(names):
             if j != i:
                 G.add_edge(name_i, name_j, weight=cooccurrences[i, j])
-    df = pd.DataFrame(cooccurrences, columns=names, index=names)
-    df.to_csv("top-%s.csv" % n)
+    for key, score in sorted(nx.pagerank_numpy(G, weight='weight'), key=lambda i: i[1], reverse=True):
+        print key, score
+    # df = pd.DataFrame(cooccurrences, columns=names, index=names)
+    # df.to_csv("top-%s.csv" % n)
 
