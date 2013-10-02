@@ -37,7 +37,7 @@ if __name__ == '__main__':
         print decade
         decade = os.path.join(root, decade)
         for filename in os.listdir(decade):
-            persons = []
+            persons = set()
             previous_person = ''
             with open(os.path.join(decade, filename)) as infile:
                 for line in infile:
@@ -46,7 +46,7 @@ if __name__ == '__main__':
                         previous_person += ' ' + word
                     elif previous_person:
                         if previous_person.lower() in top100:
-                            persons.append(previous_person.lower())
+                            persons.add(previous_person.lower())
                         previous_person = ''
             for person_a, person_b in combinations(persons, 2):
                 cooccurrences[top100[person_a], top100[person_b]] += 1
