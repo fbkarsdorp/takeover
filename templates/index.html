@@ -1,157 +1,167 @@
-<!doctype html>
-<html>
-<head>
-	
-	<meta charset="utf-8">
-	<title>{{title}}</title>
+    <!doctype html>
+    <html>
+    <head>
+        
+        <meta charset="utf-8">
+        <title>{{title}}</title>
 
-	<!-- css rendered with less -->
-	<link href="static/css/_main.css" rel="stylesheet" type="text/css" />
+        <!-- css rendered with less -->
+        <link href="static/css/_main.css" rel="stylesheet" type="text/css" />
 
-	<!-- external jquery -->
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <!-- external jquery -->
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
-	<!-- js -->
-	<script src="http://d3js.org/d3.v3.js"></script>
-	<style>
+        <!-- js -->
+        <script src="static/js/d3.js"></script>
+        <style>
 
-	body {
-		font: 10px sans-serif;
-	}
+        body {
+            font: 10px sans-serif;
+        }
 
-	.axis path,
-	.axis line {
-		fill: none;
-		stroke: #000;
-		shape-rendering: crispEdges;
-	}
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
 
-	.x.axis path {
-		display: none;
-	}
+        .x.axis path {
+            display: none;
+        }
 
-	.line {
-		fill: none;
-		stroke: steelblue;
-		stroke-width: 1.5px;
-	}
+        .line {
+            fill: none;
+            stroke: steelblue;
+            stroke-width: 1.5px;
+        }
 
-	</style>
-	
-</head>
-<body>	
+        </style>
+        
+    </head>
+    <body>  
 
-	<div id="container">
-		<div id="search">
-			<input type='text' placeholder="enter your query"/>
-		</div>
+        <div id="container">
+            <div id="search">
+                <input type='text' placeholder="enter your query"/>
+            </div>
 
-		<div id="results">
-		</div>
+            <div id="results">
+            </div>
 
-		<script>
-		function drawGraph(data) {
-			var margin = {top: 20, right: 20, bottom: 30, left: 35},
-			width = 760 - margin.left - margin.right,
-			height = 300 - margin.top - margin.bottom;
+            <script>
+            var margin = {top: 20, right: 20, bottom: 30, left: 40},
+                width = 550 - margin.left - margin.right,
+                height = 300 - margin.top - margin.bottom;
 
-			var parseDate = d3.time.format("%d-%b-%Y").parse;
+            var parseDate = d3.time.format("%d-%b-%Y").parse;
 
-			var x = d3.time.scale()
-			.range([0, width]);
+            var div = d3.select("body").append("div")   
+               .attr("class", "tooltip")               
+               .style("opacity", 0);
 
-			var y = d3.scale.linear()
-			.range([height, 0]);
+            var x = d3.time.scale()
+                .range([0, width]);
 
-			var xAxis = d3.svg.axis()
-			.scale(x)
-			.orient("bottom");
+            var y = d3.scale.linear()
+                .range([height, 0]);
 
-			var yAxis = d3.svg.axis()
-			.scale(y)
-			.orient("left");
+            var xAxis = d3.svg.axis()
+                .scale(x)
+                .orient("bottom");
 
-			var line = d3.svg.line()
-			.interpolate('linear')
-			.x(function(d) { return x(d.date); })
-			.y(function(d) { return y(d.y); });
+            var yAxis = d3.svg.axis()
+                .scale(y)
+                .orient("left");
 
-			var svg = d3.select("#results").append("svg")
-			.attr("width", width + margin.left + margin.right)
-			.attr("height", height + margin.top + margin.bottom)
-			.attr("id", "graph")
-			.append("g")
-			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            var line = d3.svg.line()
+                  .interpolate('basis')
+                  .x(function(d) { return x(d.date); })
+                  .y(function(d) { return y(d.y); });
 
+            var svg = d3.select("#results").append("svg")
+                  .attr("width", width + margin.left + margin.right)
+                  .attr("height", height + margin.top + margin.bottom)
+                  .attr("id", "graph")
+                  .append("g")
+                  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-			data.forEach(function(d) {
-				d.date = parseDate(d.date);
-				d.y = +d.y;
-			});
+            var dates = ["1-Jan-1920", "1-Jan-1930", "1-Jan-1940", "1-Jan-1950", "1-Jan-1960", 
+                         "1-Jan-1970", "1-Jan-1980", "1-Jan-1990", "1-Jan-2000"]
 
-			x.domain(d3.extent(data, function(d) { return d.date; }));
-			y.domain(d3.extent(data, function(d) { return d.y; }));
+            x.domain(d3.extent(dates, function(d) { return parseDate(d); }));
 
-			svg.append("g")
-			.attr("class", "x axis")
-			.attr("transform", "translate(0," + height + ")")
-			.call(xAxis);
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
 
-			svg.append("g")
-			.attr("class", "y axis")
-			.call(yAxis)
-			.append("text")
-			.attr("transform", "rotate(-90)")
-			.attr("y", 6)
-			.attr("id", "visualization")
-			.attr("dy", ".71em")
-			.style("text-anchor", "end");
+            svg.append("g")
+                .attr("class", "y axis")
+                .attr("y", 6)
+                .attr("id", "visualization")
+                .attr("dy", ".71em")
+                .style("text-anchor", "end")
+                .append("text");
 
-			var path = svg.append("path")
-			.attr("d", line(data))
-			.attr("stroke", "steelblue")
-			.attr("stroke-width", "2")
-			.attr("fill", "none");
+            svg.append("path")
+               .attr("stroke", "steelblue")
+               .attr("stroke-width", "2")
+               .attr("fill", "none");
 
-			var totalLength = path.node().getTotalLength();
+            function drawGraph(data) {
 
-			path
-			.attr("stroke-dasharray", totalLength + " " + totalLength)
-			.attr("stroke-dashoffset", totalLength)
-			.transition()
-			.duration(2000)
-			.ease("linear")
-			.attr("stroke-dashoffset", 0);
-}
+                data.forEach(function(d) {
+                    d.date = parseDate(d.date);
+                    d.y = +d.y;
+                })
 
-		$(document).ready(function(){
+                y.domain(d3.extent(data, function(d) { return d.y; }));
 
-			$("#search input").on("keydown",function(e){
-				if(e.keyCode == "13"){
-					$("#results").addClass("loading");
-					$("#results").html("");
-					query = $(this).val();
-					$.ajax({
-						url:"/data",
-						data:{"q":query},
-						method:"POST",
-						dataType: "json",
-						success:function(data) {
-							$("#results").remove("#graph");
-							drawGraph(data);
-							$("#results").removeClass("loading");
-						},
-						error:function(){
-							$("#results").removeClass("loading");
-							$("#results").html("oops, something went wrong...");
-						}
-					})
-				}
-			})
-		})
+                svg.select(".x.axis")
+                  .transition()
+                  .duration(750)
+                  .call(xAxis);
 
-		</script>
+                svg.select(".y.axis")
+                  .transition()
+                  .duration(750)
+                  .call(yAxis)
 
-	</div>
-</body>
-</html>
+                var path = svg.selectAll("path")
+                   .transition()
+                   .duration(750)
+                   .ease("linear")
+                   .attr("d", line(data))
+            }  
+
+            $(document).ready(function(){
+
+                $("#search input").on("keydown",function(event){
+                    if(event.keyCode == "13"){
+                        $("#results").addClass("loading");
+                        //$("#results").html("");
+                        query = $(this).val();
+                        $.ajax({
+                            url:"/data",
+                            data:{"q":query},
+                            method:"POST",
+                            dataType: "json",
+                            success:function(data) {
+                                //redraw(data)
+                                drawGraph(data);
+                                $("#results").removeClass("loading");
+                            },
+                            error:function(){
+                                $("#results").removeClass("loading");
+                                $("#results").html("oops, something went wrong...");
+                            }
+                        })
+                    }
+                })
+            })
+
+            </script>
+
+        </div>
+    </body>
+    </html>
