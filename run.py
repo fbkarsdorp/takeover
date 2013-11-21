@@ -33,7 +33,8 @@ def data():
                 return Series()
             return Series(counts, map(to_datetime, labels))
         
-        series = to_series(request.form['q'].strip())
+        querystring = request.form['q'].strip()
+        series = to_series(querystring)
         return json.dumps([{'_id': i, 'date': x.strftime('%d-%b-%Y'), 'y': y} for i, (x, y) in enumerate(sorted(series.iteritems()))])
 
 @app.route('/')
