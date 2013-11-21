@@ -89,13 +89,9 @@
             var dates = ["1-Jan-1920", "1-Jan-1930", "1-Jan-1940", "1-Jan-1950", "1-Jan-1960", 
                          "1-Jan-1970", "1-Jan-1980", "1-Jan-1990", "1-Jan-2000"]
 
-            x.domain(d3.extent(dates, function(d) { return parseDate(d); }));
-
             svg.append("g")
                 .attr("class", "x axis")
                 .attr("transform", "translate(0," + height + ")")
-
-            var color = d3.scale.category20b();
 
             svg.append("g")
                 .attr("class", "y axis")
@@ -113,6 +109,7 @@
                 var dataarray = []
                 dataarray = dataarray.concat.apply(dataarray, dataset)
 
+                x.domain(d3.extent(dataarray, function(d) { return parseDate(d.date); }));
                 y.domain(d3.extent(dataarray, function(d) { return +d.y; }));
 
                 svg.select(".x.axis")
